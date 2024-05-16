@@ -12,7 +12,7 @@ PORT(
 END ENTITY Taktteiler;
 
 ARCHITECTURE behavioral1 OF Taktteiler IS
-	CONSTANT CLK_FREQ : INTEGER := 50;--000000; --Frequency in Hz
+	CONSTANT CLK_FREQ : INTEGER := 50000000;--000000; --Frequency in Hz
 	CONSTANT TAKT_FREQ : INTEGER := 10; --Frequency in Hz
 BEGIN
 synch: PROCESS (clk)
