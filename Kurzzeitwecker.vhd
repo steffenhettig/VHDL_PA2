@@ -38,10 +38,10 @@ ARCHITECTURE behavioral2 OF Kurzzeitwecker IS
 	SIGNAL sek_mem : INTEGER := 0;
 	SIGNAL dezisek_mem : INTEGER := 0;
 	
-	SIGNAL leave_idle_flag : BIT := '0';
-	SIGNAL counting_finish_flag : BIT := '0';
-	SIGNAL back_to_setup_flag : BIT := '0';
-	SIGNAL time_locked_flag : BIT := '0';
+	--SIGNAL leave_idle_flag : BIT := '0';
+	--SIGNAL counting_finish_flag : BIT := '0';
+	--SIGNAL back_to_setup_flag : BIT := '0';
+	--SIGNAL time_locked_flag : BIT := '0';
 	
 	SIGNAL min_counter : INTEGER := 0;
 	
@@ -61,68 +61,68 @@ BEGIN
 
 -----------------------------------------
 
-in_transitionlogic : PROCESS (current_state, START_STOP_BUTTON, CLEAR_BUTTON)--, leave_idle_flag, counting_finish_flag, back_to_setup_flag) --Transitionslogik
-BEGIN
---			IF (current_state = idle) THEN
---				IF (leave_idle_flag = '1')
---					THEN next_state <= setup_time;
---				END IF;
---			END IF;
+--in_transitionlogic : PROCESS (current_state, START_STOP_BUTTON, CLEAR_BUTTON)--, leave_idle_flag, counting_finish_flag, back_to_setup_flag) --Transitionslogik
+--BEGIN
+----			IF (current_state = idle) THEN
+----				IF (leave_idle_flag = '1')
+----					THEN next_state <= setup_time;
+----				END IF;
+----			END IF;
+----			
+----			IF (current_state = setup_time) THEN
+----				IF CLEAR_BUTTON = '1' --debouncing
+----					THEN next_state <= idle;
+----				END IF;
+----				IF START_STOP_BUTTON = '1'	--debouncing
+----					THEN next_state <= time_running;
+----				END IF;
+----			END IF;
+----			
+----			IF (current_state = time_running) THEN
+----				IF START_STOP_BUTTON = '1' --debouncing
+----					THEN next_state <= setup_time;
+----				END IF;
+----				IF (counting_finish_flag = '1')
+----					THEN next_state <= time_finish;
+----				END IF;
+----			END IF;
+----			
+----			IF (current_state = time_finish) THEN
+----				IF (back_to_setup_flag = '1')
+----					THEN next_state <= setup_time;
+----				END IF;
+----			END IF;
 --			
---			IF (current_state = setup_time) THEN
---				IF CLEAR_BUTTON = '1' --debouncing
---					THEN next_state <= idle;
---				END IF;
---				IF START_STOP_BUTTON = '1'	--debouncing
---					THEN next_state <= time_running;
---				END IF;
---			END IF;
+--		--IF rising_edge(clk) THEN
 --			
---			IF (current_state = time_running) THEN
---				IF START_STOP_BUTTON = '1' --debouncing
---					THEN next_state <= setup_time;
---				END IF;
---				IF (counting_finish_flag = '1')
---					THEN next_state <= time_finish;
---				END IF;
---			END IF;
---			
---			IF (current_state = time_finish) THEN
---				IF (back_to_setup_flag = '1')
---					THEN next_state <= setup_time;
---				END IF;
---			END IF;
-			
-		--IF rising_edge(clk) THEN
-			
-			 CASE current_state IS
-        WHEN idle =>
-            IF (leave_idle_flag = '1') THEN
-                --next_state <= setup_time;
-            END IF;
-        WHEN setup_time =>
-            IF CLEAR_BUTTON = '1' THEN --debouncing
-                --next_state <= idle;
-            END IF;
-            IF START_STOP_BUTTON = '1' THEN --debouncing
-                --next_state <= time_running;
-            END IF;
-        WHEN time_running =>
+--			 CASE current_state IS
+--        WHEN idle =>
+--            IF (leave_idle_flag = '1') THEN
+--                --next_state <= setup_time;
+--            END IF;
+--        WHEN setup_time =>
+--            IF CLEAR_BUTTON = '1' THEN --debouncing
+--                --next_state <= idle;
+--            END IF;
 --            IF START_STOP_BUTTON = '1' THEN --debouncing
---                next_state <= setup_time;
+--                --next_state <= time_running;
 --            END IF;
---            IF (counting_finish_flag = '1') THEN
---                next_state <= time_finish;
---            END IF;
-        WHEN time_finish =>
---            IF (back_to_setup_flag = '1') THEN
---                next_state <= setup_time;
---            END IF;
-    END CASE;
-	 
-	 --END IF;
-							
-END PROCESS in_transitionlogic;
+--        WHEN time_running =>
+----            IF START_STOP_BUTTON = '1' THEN --debouncing
+----                next_state <= setup_time;
+----            END IF;
+----            IF (counting_finish_flag = '1') THEN
+----                next_state <= time_finish;
+----            END IF;
+--        WHEN time_finish =>
+----            IF (back_to_setup_flag = '1') THEN
+----                next_state <= setup_time;
+----            END IF;
+--    END CASE;
+--	 
+--	 --END IF;
+--							
+--END PROCESS in_transitionlogic;
 
 -----------------------------------------
 reg_process : PROCESS (clk, dezisek_en) --speichernder Teil
@@ -138,39 +138,46 @@ VARIABLE SEK_last_state : std_logic := '0';
 VARIABLE MIN_last_state : std_logic := '0';
 VARIABLE CLEAR_last_state : std_logic := '0';
 VARIABLE START_STOP_last_state : std_logic := '0';
---VARIABLE leave_idle_flag : std_logic := '0';
---VARIABLE counting_finish_flag : std_logic := '0';
---VARIABLE back_to_setup_flag : std_logic := '0';
---VARIABLE time_locked_flag : std_logic := '0';
+VARIABLE leave_idle_flag : std_logic := '0';
+VARIABLE counting_finish_flag : std_logic := '0';
+VARIABLE back_to_setup_flag : std_logic := '0';
+VARIABLE time_locked_flag : std_logic := '0';
 
 
 BEGIN
 
 	IF rising_edge(clk) THEN
+	
+		-- If Sek-Button is pressed
 		IF (SEK_last_state = '1') AND (SEK_BUTTON = '0') THEN
 		
 		CASE current_state IS
 			WHEN idle =>
+				time_locked_flag := '0';
 				sek_output <= sek_output + 1;
 				--leave_idle_flag <= '1';
 				next_state <= setup_time;
 				
 			WHEN setup_time =>
-				--time_locked_flag <= '0';
+				time_locked_flag := '0';
 				dezisek_output <= 0;
 				sek_output <= sek_output + 1;
-				IF (sek_output = 9) THEN
-					zehnsek_output <= zehnsek_output + 1;
-					sek_output <= 0;
-				END IF;
-				IF (zehnsek_output = 5) THEN
-					zehnsek_output <= 0;
-				END IF;
 				
 			WHEN OTHERS =>	
 		END CASE;
 		END IF;
 		
+		IF (sek_output = 10) THEN
+			zehnsek_output <= zehnsek_output + 1;
+			sek_output <= 0;
+		END IF;
+		IF (zehnsek_output = 6) THEN
+			zehnsek_output <= 0;
+		END IF;
+		
+		
+		
+		-- If Min-Button is pressed
 		IF (MIN_last_state = '1') AND (MIN_BUTTON = '0') THEN
 		
 		CASE current_state IS
@@ -179,7 +186,7 @@ BEGIN
 				next_state <= setup_time;
 				
 			WHEN setup_time =>
-				--time_locked_flag <= '0';
+				time_locked_flag := '0';
 				dezisek_output <= 0;
 				min_output <= min_output + 1;
 				IF (min_output = 9) THEN
@@ -191,6 +198,7 @@ BEGIN
 		END IF;
 		
 	
+	-- If Clear-Button is pressed
 	IF (CLEAR_last_state = '1') AND (CLEAR_BUTTON = '0') THEN
 		
 		CASE current_state IS
@@ -201,7 +209,9 @@ BEGIN
 			WHEN OTHERS =>	
 		END CASE;
 		END IF;
-		
+	
+
+	-- If Start-Stop-Button is pressed
 	IF (START_STOP_last_state = '1') AND (START_STOP_BUTTON = '0') THEN
 		
 		CASE current_state IS
@@ -212,12 +222,23 @@ BEGIN
 			WHEN time_running =>
 				next_state <= setup_time;
 				
+			WHEN time_finish =>
+				tone_output <= '0';
+				min_counter <= 0;
+				min_output <= min_mem;
+				zehnsek_output <= zehnsek_mem;
+				sek_output <= sek_mem;
+				dezisek_output <= dezisek_mem;
+				
+				next_state <= setup_time;
+				
 			WHEN OTHERS =>	
 		END CASE;
 		END IF;	
 		
 	
 	IF (current_state = time_running) THEN
+		time_locked_flag := '1';
 		IF (dezisek_en = '1') THEN
 										dezisek_output <= dezisek_output -1;
 									END IF;	
@@ -237,12 +258,53 @@ BEGIN
 											
 										
 									IF((min_output = 0) AND (zehnsek_output = 0) AND (sek_output = 0) AND (dezisek_output = 0)) THEN
-										counting_finish_flag <= '1';
+										--counting_finish_flag := '1';
+										next_state <= time_finish;
 									END IF;
 
 	END IF;
 	
+	IF (current_state = idle) THEN
+		min_output <= 0;
+		zehnsek_output <= 0;
+		sek_output <= 0;
+		dezisek_output <= 0;
+	END IF;
 	
+	IF (current_state = setup_time) THEN
+		IF (time_locked_flag = '0') THEN
+			min_mem <= min_output;
+			zehnsek_mem <= zehnsek_output;
+			sek_mem <= sek_output;
+			dezisek_mem <= dezisek_output;
+		END IF;
+		
+			--leave_idle_flag := '0';
+			--back_to_setup_flag := '0';
+	END IF;
+	
+	IF (current_state = time_finish) THEN
+		IF (dezisek_en = '1') THEN
+		min_counter <= min_counter + 1;
+									
+		tone_output <= '1';
+		END IF;
+		IF(min_counter > 600) THEN
+			tone_output <= '0';
+			min_counter <= 0;
+			min_output <= min_mem;
+			zehnsek_output <= zehnsek_mem;
+			sek_output <= sek_mem;
+			dezisek_output <= dezisek_mem;
+			
+			next_state <= setup_time;
+--		ELSE
+--			tone_output <= '1';
+		END IF;
+	END IF;
+	
+	
+		-- Zuweisungen, um die fallenden Flanken zu erkennen
 		CLEAR_last_state := CLEAR_BUTTON;
 		MIN_last_state := MIN_BUTTON;
 		SEK_last_state := SEK_BUTTON;
@@ -250,141 +312,141 @@ BEGIN
 	END IF;
 	
 	
-	
-	
-	
-			CASE current_state IS
-							WHEN idle =>													--idle
-										--IF (leave_idle_flag = '0') THEN
-										min_output <= 0;
-										zehnsek_output <= 0;
-										sek_output <= 0;
-										dezisek_output <= 0;
-										--END IF;
+--	
+--	
+--	
+--			CASE current_state IS
+--							WHEN idle =>													--idle
+--										--IF (leave_idle_flag = '0') THEN
+--										min_output <= 0;
+--										zehnsek_output <= 0;
+--										sek_output <= 0;
+--										dezisek_output <= 0;
+--										--END IF;
+----										
+----										
+----										IF MIN_BUTTON = '1' THEN --debouncing
+----											min_output <= min_output + 1;
+----											--leave_idle_flag <= '1';
+----										END IF;
+----										
 --										
---										
---										IF MIN_BUTTON = '1' THEN --debouncing
---											min_output <= min_output + 1;
---											--leave_idle_flag <= '1';
---										END IF;
---										
-										
-							WHEN setup_time =>											--setup_time
-									------------------
---									min_output <= 7;
+--							WHEN setup_time =>											--setup_time
 --									------------------
-									leave_idle_flag <= '0';
-									back_to_setup_flag <= '0';
-----									IF SEK_BUTTON = '1' THEN --debouncing
+----									min_output <= 7;
+----									------------------
+--									leave_idle_flag <= '0';
+--									back_to_setup_flag <= '0';
+------									IF SEK_BUTTON = '1' THEN --debouncing
+------										time_locked_flag <= '0';
+------										dezisek_output <= 0;
+------										sek_output <= sek_output + 1;
+------										END IF;
+----										IF (sek_output = 10) THEN
+----											zehnsek_output <= zehnsek_output + 1;
+----											sek_output <= 0;
+----											END IF;
+----											IF (zehnsek_output = 6) THEN
+----											zehnsek_output <= 0;
+----											END IF;
+----									IF MIN_BUTTON = '1' THEN --debouncing
 ----										time_locked_flag <= '0';
 ----										dezisek_output <= 0;
-----										sek_output <= sek_output + 1;
+----										min_output <= min_output + 1;
+----										
+----										IF (min_output = 10) THEN
+----											min_output <= 0;
 ----										END IF;
---										IF (sek_output = 10) THEN
---											zehnsek_output <= zehnsek_output + 1;
---											sek_output <= 0;
---											END IF;
---											IF (zehnsek_output = 6) THEN
---											zehnsek_output <= 0;
---											END IF;
---									IF MIN_BUTTON = '1' THEN --debouncing
---										time_locked_flag <= '0';
---										dezisek_output <= 0;
---										min_output <= min_output + 1;
---										
---										IF (min_output = 10) THEN
---											min_output <= 0;
---										END IF;
+----									END IF;
+----									
+--									IF (time_locked_flag = '0') THEN
+--										min_mem <= min_output;
+--										zehnsek_mem <= zehnsek_output;
+--										sek_mem <= sek_output;
+--										dezisek_mem <= dezisek_output;
 --									END IF;
+--
 --									
-									IF (time_locked_flag = '0') THEN
-										min_mem <= min_output;
-										zehnsek_mem <= zehnsek_output;
-										sek_mem <= sek_output;
-										dezisek_mem <= dezisek_output;
-									END IF;
-
-									
---							WHEN time_running =>										--time_running
+----							WHEN time_running =>										--time_running
+----									--IF (rising_edge(clk)) THEN
+----									time_locked_flag <= '1';
+----									--IF (rising_edge(clk) = '1') THEN
+----									IF (dezisek_en = '1') THEN
+----										dezisek_output <= dezisek_output -1;
+----										
+----										IF(dezisek_output = -1) THEN
+----											dezisek_output <= 9;
+----											sek_output <= sek_output - 1;
+----											IF(sek_output = -1) THEN
+----												sek_output <= 9;
+----												zehnsek_output <= zehnsek_output - 1;
+----												IF(zehnsek_output = -1) THEN
+----													zehnsek_output <= 5;
+----													min_output <= min_output - 1;
+----												END IF;
+----											END IF;
+----										END IF;	
+----									END IF;	
+----									IF((min_output = 0) AND (zehnsek_output = 0) AND (sek_output = 0) AND (dezisek_output = 0)) THEN
+----										counting_finish_flag <= '1';
+----									END IF;
+----									--END IF;
+--								
+--								
+--								WHEN time_running =>										--time_running
 --									--IF (rising_edge(clk)) THEN
---									time_locked_flag <= '1';
---									--IF (rising_edge(clk) = '1') THEN
---									IF (dezisek_en = '1') THEN
---										dezisek_output <= dezisek_output -1;
---										
---										IF(dezisek_output = -1) THEN
---											dezisek_output <= 9;
---											sek_output <= sek_output - 1;
---											IF(sek_output = -1) THEN
---												sek_output <= 9;
---												zehnsek_output <= zehnsek_output - 1;
---												IF(zehnsek_output = -1) THEN
---													zehnsek_output <= 5;
---													min_output <= min_output - 1;
---												END IF;
---											END IF;
---										END IF;	
---									END IF;	
---									IF((min_output = 0) AND (zehnsek_output = 0) AND (sek_output = 0) AND (dezisek_output = 0)) THEN
---										counting_finish_flag <= '1';
---									END IF;
---									--END IF;
-								
-								
-								WHEN time_running =>										--time_running
-									--IF (rising_edge(clk)) THEN
-									--time_locked_flag <= '1';
---									IF rising_edge(clk) THEN
---									IF (dezisek_en = '1') THEN
---										dezisek_output <= dezisek_output -1;
---									END IF;	
---									IF(dezisek_output = -1) THEN
---											dezisek_output <= 9;
---											sek_output <= sek_output - 1;
---											END IF;
---									IF(sek_output = -1) THEN
---												sek_output <= 9;
---												zehnsek_output <= zehnsek_output - 1;
---												END IF;
---									IF(zehnsek_output = -1) THEN
---													zehnsek_output <= 5;
---													min_output <= min_output - 1;
---												END IF;
---											
---											
---										
---									IF((min_output = 0) AND (zehnsek_output = 0) AND (sek_output = 0) AND (dezisek_output = 0)) THEN
---										counting_finish_flag <= '1';
---									END IF;
---									END IF;
-									
-								
-							WHEN time_finish =>		
---									counting_finish_flag <= '0';
---									min_counter <= min_counter + 1;
+--									--time_locked_flag <= '1';
+----									IF rising_edge(clk) THEN
+----									IF (dezisek_en = '1') THEN
+----										dezisek_output <= dezisek_output -1;
+----									END IF;	
+----									IF(dezisek_output = -1) THEN
+----											dezisek_output <= 9;
+----											sek_output <= sek_output - 1;
+----											END IF;
+----									IF(sek_output = -1) THEN
+----												sek_output <= 9;
+----												zehnsek_output <= zehnsek_output - 1;
+----												END IF;
+----									IF(zehnsek_output = -1) THEN
+----													zehnsek_output <= 5;
+----													min_output <= min_output - 1;
+----												END IF;
+----											
+----											
+----										
+----									IF((min_output = 0) AND (zehnsek_output = 0) AND (sek_output = 0) AND (dezisek_output = 0)) THEN
+----										counting_finish_flag <= '1';
+----									END IF;
+----									END IF;
 --									
---									tone_output <= '1';
---									IF(min_counter > 600) THEN
---										tone_output <= '0';
---										min_counter <= 0;
---										min_output <= min_mem;
---										zehnsek_output <= zehnsek_mem;
---										sek_output <= sek_mem;
---										dezisek_output <= dezisek_mem;
---										back_to_setup_flag <= '1';
---									END IF;	
---										
---									IF START_STOP_BUTTON = '1' THEN --debouncing
---										tone_output <= '0';
---										--min_counter <= 0;
---										min_output <= min_mem;
---										zehnsek_output <= zehnsek_mem;
---										sek_output <= sek_mem;
---										dezisek_output <= dezisek_mem;
---										back_to_setup_flag <= '1';
---									END IF;
-						
-				END CASE;	
+--								
+--							WHEN time_finish =>		
+----									counting_finish_flag <= '0';
+----									min_counter <= min_counter + 1;
+----									
+----									tone_output <= '1';
+----									IF(min_counter > 600) THEN
+----										tone_output <= '0';
+----										min_counter <= 0;
+----										min_output <= min_mem;
+----										zehnsek_output <= zehnsek_mem;
+----										sek_output <= sek_mem;
+----										dezisek_output <= dezisek_mem;
+----										back_to_setup_flag <= '1';
+----									END IF;	
+----										
+----									IF START_STOP_BUTTON = '1' THEN --debouncing
+----										tone_output <= '0';
+----										--min_counter <= 0;
+----										min_output <= min_mem;
+----										zehnsek_output <= zehnsek_mem;
+----										sek_output <= sek_mem;
+----										dezisek_output <= dezisek_mem;
+----										back_to_setup_flag <= '1';
+----									END IF;
+--						
+--				END CASE;	
 	
 
 		
