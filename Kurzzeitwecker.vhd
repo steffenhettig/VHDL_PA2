@@ -14,10 +14,10 @@ PORT(
 	CLEAR_BUTTON : IN std_logic;
 	START_STOP_BUTTON : IN std_logic;
 	dezisek_en : IN std_logic;
-	m3, m2, m1, m0: BUFFER BIT;
-	z3, z2, z1, z0: BUFFER BIT;
-	s3, s2, s1, s0: BUFFER BIT;
-	d3, d2, d1, d0: BUFFER BIT;
+	m3, m2, m1, m0: BUFFER std_logic;
+	z3, z2, z1, z0: BUFFER std_logic;
+	s3, s2, s1, s0: BUFFER std_logic;
+	d3, d2, d1, d0: BUFFER std_logic;
 	tone_output : OUT std_logic);
 END ENTITY Kurzzeitwecker;
 
@@ -45,7 +45,7 @@ ARCHITECTURE behavioral2 OF Kurzzeitwecker IS
 	COMPONENT vector_casting
 	PORT(
 		Dezimalzahl: IN INTEGER;
-		b3, b2, b1, b0: OUT BIT);
+		b3, b2, b1, b0: OUT std_logic);
 	END COMPONENT;
 
 BEGIN
@@ -131,6 +131,9 @@ BEGIN
 			next_state := setup_time;
 		END IF;
 	END IF;
+	
+	
+	----------------------------------------------------
 	
 		-- If Sek-Button is pressed
 		IF (SEK_last_state = '1') AND (SEK_BUTTON = '0') THEN
@@ -227,15 +230,11 @@ BEGIN
 		MIN_last_state := MIN_BUTTON;
 		SEK_last_state := SEK_BUTTON;
 		START_STOP_last_state := START_STOP_BUTTON;
-		
-		
-		
+	
 		current_state := next_state;
 		
 	END IF;
 	
-	
-
 		
 END PROCESS output_logic;
 
