@@ -16,21 +16,25 @@ END ENTITY Tonausgabe;
 ARCHITECTURE behavioral6 OF Tonausgabe IS
 	SIGNAL tone_output_counter : INTEGER := 0;
 BEGIN
-synch: PROCESS (clk)
+synch: PROCESS (clk, dezisek_en)
 
 BEGIN
-		IF tone_output = '1' THEN
-				IF rising_edge(clk) THEN
-					IF dezisek_en = '1' THEN
+			IF rising_edge(clk) THEN
+				IF dezisek_en = '1' THEN
+					IF tone_output = '1' THEN
 						tone_output_counter <= tone_output_counter + 1;
-						IF tone_output_counter <= 6 THEN
-							tone_signal <= tone_signal XOR '1' ;
+						IF tone_output_counter <= 5 THEN
+							tone_signal <= tone_signal XOR '1';
 						END IF;
 						IF tone_output_counter = 10 THEN
 							tone_output_counter <= 0;
 						END IF;
+					ELSE
+						tone_signal <= '0';
+						tone_output_counter <= 0;
 					END IF;
-				END IF;
+				END IF;	
 		END IF;
+		
 END PROCESS synch;
 END ARCHITECTURE behavioral6;
