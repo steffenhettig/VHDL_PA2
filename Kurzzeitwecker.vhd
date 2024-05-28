@@ -37,11 +37,6 @@ ARCHITECTURE behavioral2 OF Kurzzeitwecker IS
 	
 	SIGNAL min_counter : INTEGER := 0;
 	
-	SIGNAL m_vector : std_logic_vector(4 DOWNTO 0); --zur Bündelung von m4 bis m0
-	SIGNAL z_vector : std_logic_vector(4 DOWNTO 0); --zur Bündelung von z4 bis z0
-	SIGNAL s_vector : std_logic_vector(4 DOWNTO 0); --zur Bündelung von s4 bis s0
-	SIGNAL d_vector : std_logic_vector(4 DOWNTO 0); --zur Bündelung von d4 bis d0
-	
 	COMPONENT vector_casting
 	PORT(
 		Dezimalzahl: IN INTEGER;
@@ -57,18 +52,19 @@ VARIABLE SEK_last_state : std_logic := '0';
 VARIABLE MIN_last_state : std_logic := '0';
 VARIABLE CLEAR_last_state : std_logic := '0';
 VARIABLE START_STOP_last_state : std_logic := '0';
-VARIABLE leave_idle_flag : std_logic := '0';
-VARIABLE counting_finish_flag : std_logic := '0';
-VARIABLE back_to_setup_flag : std_logic := '0';
 VARIABLE time_locked_flag : std_logic := '0';
 
-VARIABLE current_state: T_StATE := idle;
+VARIABLE current_state: T_STATE := idle;
 VARIABLE next_state: T_STATE := idle;
 
 
 BEGIN
 
 	IF rising_edge(clk) THEN
+	
+	---speichernder Teil
+	current_state := next_state;
+	
 	
 	
 	IF (current_state = time_running) THEN
@@ -231,7 +227,7 @@ BEGIN
 		SEK_last_state := SEK_BUTTON;
 		START_STOP_last_state := START_STOP_BUTTON;
 	
-		current_state := next_state;
+		
 		
 	END IF;
 	
