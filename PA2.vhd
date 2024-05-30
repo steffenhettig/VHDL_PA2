@@ -1,5 +1,6 @@
 -- Author: Steffen Hettig
 -- Matrikel: 189318
+-- Datum: 01.06.2024
 
 LIBRARY IEEE;
 USE IEEE.std_logic_1164.ALL;
@@ -22,7 +23,8 @@ PORT(
 	sek_g, sek_f, sek_e, sek_d, sek_c, sek_b, sek_a: OUT std_logic;
 	dezisek_g, dezisek_f, dezisek_e, dezisek_d, dezisek_c, dezisek_b, dezisek_a: OUT std_logic;
 	tone_output : BUFFER std_logic;
-	tone_signal : BUFFER std_logic);
+	tone_signal : BUFFER std_logic;
+	force_g, force_f, force_e, force_d, force_c, force_b, force_a: OUT std_logic);
 END ENTITY PA2;
 
 ARCHITECTURE Behavioral OF PA2 IS
@@ -63,6 +65,14 @@ ARCHITECTURE Behavioral OF PA2 IS
 	END COMPONENT;
 	
 BEGIN
+
+	force_a <= '1';
+	force_b <= '1';
+	force_c <= '1';
+	force_d <= '1';
+	force_e <= '1';
+	force_f <= '1';
+	force_g <= '1';
 
 	clock_divider: COMPONENT Taktteiler PORT MAP (clk => clk, takt => dezisek_en);
 	
