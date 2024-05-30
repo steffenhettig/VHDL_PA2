@@ -1,5 +1,6 @@
 -- Author: Steffen Hettig
 -- Matrikel: 189318
+-- Datum: 01.06.2024
 
 LIBRARY IEEE;
 USE IEEE.std_logic_1164.ALL;
@@ -70,28 +71,27 @@ BEGIN
 	IF (current_state = time_running) THEN
 		time_locked_flag := '1';
 		IF (dezisek_en = '1') THEN
-										dezisek_output <= dezisek_output -1;
-									END IF;	
-									IF(dezisek_output = -1) THEN
-											dezisek_output <= 9;
-											sek_output <= sek_output - 1;
-											END IF;
-									IF(sek_output = -1) THEN
-												sek_output <= 9;
-												zehnsek_output <= zehnsek_output - 1;
-												END IF;
-									IF(zehnsek_output = -1) THEN
-													zehnsek_output <= 5;
-													min_output <= min_output - 1;
-												END IF;
-											
-											
-										
-									IF((min_output = 0) AND (zehnsek_output = 0) AND (sek_output = 0) AND (dezisek_output = 0)) THEN
-										next_state := time_finish;
-									END IF;
-
+			dezisek_output <= dezisek_output -1;
+		END IF;	
+		
+		IF(dezisek_output = -1) THEN
+			dezisek_output <= 9;
+			sek_output <= sek_output - 1;
+		END IF;
+		IF(sek_output = -1) THEN
+			sek_output <= 9;
+			zehnsek_output <= zehnsek_output - 1;
+		END IF;
+		IF(zehnsek_output = -1) THEN
+			zehnsek_output <= 5;
+			min_output <= min_output - 1;
+		END IF;
+												
+		IF((min_output = 0) AND (zehnsek_output = 0) AND (sek_output = 0) AND (dezisek_output = 0)) THEN
+			next_state := time_finish;
+		END IF;
 	END IF;
+	
 	
 	IF (current_state = idle) THEN
 		min_output <= 0;
@@ -116,7 +116,7 @@ BEGIN
 									
 		tone_output <= '1';
 		END IF;
-		IF(min_counter > 60) THEN
+		IF(min_counter > 600) THEN
 			tone_output <= '0';
 			min_counter <= 0;
 			min_output <= min_mem;
@@ -133,21 +133,17 @@ BEGIN
 	
 		-- If Sek-Button is pressed
 		IF (SEK_last_state = '1') AND (SEK_BUTTON = '0') THEN
-		
-		CASE current_state IS
-			WHEN idle =>
+			IF current_state = idle THEN
 				time_locked_flag := '0';
 				sek_output <= sek_output + 1;
-				--leave_idle_flag <= '1';
 				next_state := setup_time;
-				
-			WHEN setup_time =>
+			END IF;
+			IF current_state = setup_time THEN
 				time_locked_flag := '0';
 				dezisek_output <= 0;
 				sek_output <= sek_output + 1;
-				
-			WHEN OTHERS =>	
-		END CASE;
+			END IF;
+			
 		END IF;
 		
 		IF (sek_output = 10) THEN
@@ -162,50 +158,38 @@ BEGIN
 		
 		-- If Min-Button is pressed
 		IF (MIN_last_state = '1') AND (MIN_BUTTON = '0') THEN
-		
-		CASE current_state IS
-			WHEN idle =>
+			IF current_state = idle THEN
 				min_output <= min_output + 1;
 				next_state := setup_time;
-				
-			WHEN setup_time =>
+			END IF;
+			IF current_state = setup_time THEN
 				time_locked_flag := '0';
 				dezisek_output <= 0;
 				min_output <= min_output + 1;
 				IF (min_output = 9) THEN
 					min_output <= 0;
 				END IF;
-				
-			WHEN OTHERS =>	
-		END CASE;
+			END IF;
 		END IF;
 		
 	
 	-- If Clear-Button is pressed
 	IF (CLEAR_last_state = '1') AND (CLEAR_BUTTON = '0') THEN
-		
-		CASE current_state IS
-				
-			WHEN setup_time =>
+			IF current_state = setup_time THEN
 				next_state := idle;
-				
-			WHEN OTHERS =>	
-		END CASE;
-		END IF;
+			END IF;
+	END IF;
 	
 
 	-- If Start-Stop-Button is pressed
 	IF (START_STOP_last_state = '1') AND (START_STOP_BUTTON = '0') THEN
-		
-		CASE current_state IS
-				
-			WHEN setup_time =>
+			IF current_state = setup_time THEN
 				next_state := time_running;
-				
-			WHEN time_running =>
+			END IF;
+			IF current_state = time_running THEN
 				next_state := setup_time;
-				
-			WHEN time_finish =>
+			END IF;
+			IF current_state = time_finish THEN
 				tone_output <= '0';
 				min_counter <= 0;
 				min_output <= min_mem;
@@ -214,9 +198,8 @@ BEGIN
 				dezisek_output <= dezisek_mem;
 				
 				next_state := setup_time;
-				
-			WHEN OTHERS =>	
-		END CASE;
+			END IF;
+			
 		END IF;	
 		
 
