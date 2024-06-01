@@ -1,5 +1,6 @@
 -- Author: Steffen Hettig
 -- Matrikel: 189318
+-- Datum: 01.06.2024
 
 LIBRARY IEEE;
 USE IEEE.std_logic_1164.ALL;
@@ -12,7 +13,7 @@ PORT(
 END ENTITY Taktteiler;
 
 ARCHITECTURE behavioral1 OF Taktteiler IS
-	CONSTANT CLK_FREQ : INTEGER := 50000000;--000000; --Frequency in Hz
+	CONSTANT CLK_FREQ : INTEGER := 50000000; --Frequency in Hz
 	CONSTANT TAKT_FREQ : INTEGER := 10; --Frequency in Hz
 BEGIN
 synch: PROCESS (clk)
