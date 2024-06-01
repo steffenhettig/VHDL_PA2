@@ -1,5 +1,6 @@
 -- Author: Steffen Hettig
 -- Matrikel: 189318
+-- Datum: 01.06.2024
 
 LIBRARY IEEE;
 USE IEEE.std_logic_1164.ALL;
@@ -7,11 +8,11 @@ USE IEEE.std_logic_1164.ALL;
 ENTITY vector_casting IS
 PORT (	
 	Dezimalzahl : IN INTEGER;
-	b3, b2, b1, b0: OUT BIT);
+	b3, b2, b1, b0: OUT std_logic);
 END ENTITY vector_casting;
 
 ARCHITECTURE behavioral5 OF vector_casting is
-   SIGNAL b_vector: BIT_VECTOR(3 DOWNTO 0); -- Vektor b3,b2,b1,b0 
+   SIGNAL b_vector: std_logic_vector(3 DOWNTO 0); -- Vektor b3,b2,b1,b0 
 
 BEGIN
 
