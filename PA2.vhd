@@ -65,7 +65,8 @@ ARCHITECTURE Behavioral OF PA2 IS
 	END COMPONENT;
 	
 BEGIN
-
+	--die 7-Segment-Anzeige HEX7 ausschalten
+	--diese wurde angesteuert, obwohl dies nicht gewünscht ist
 	force_a <= '1';
 	force_b <= '1';
 	force_c <= '1';
