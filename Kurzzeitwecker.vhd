@@ -47,7 +47,7 @@ ARCHITECTURE behavioral2 OF Kurzzeitwecker IS
 BEGIN
 
 
-output_logic : PROCESS (clk, dezisek_en) --Beschreibt, was im Zustand ausgeführt werden soll
+statemachine_logic : PROCESS (clk, dezisek_en) --Beschreibt, was im Zustand ausgeführt werden soll
 
 VARIABLE SEK_last_state : std_logic := '0';
 VARIABLE MIN_last_state : std_logic := '0';
@@ -63,17 +63,23 @@ BEGIN
 
 	IF rising_edge(clk) THEN
 	
+	----------------------------------------------------
 	---speichernder Teil
+	----------------------------------------------------
 	current_state := next_state;
 	
 	
-	
+	----------------------------------------------------
+	--Output-Teil: Dieser Teil beschreibt, was in den jeweiligen Zuständen
+	--ausgegeben werden soll
+	----------------------------------------------------
 	IF (current_state = time_running) THEN
 		time_locked_flag := '1';
 		IF (dezisek_en = '1') THEN
 			dezisek_output <= dezisek_output -1;
 		END IF;	
 		
+		--Underflow-Handling
 		IF(dezisek_output = -1) THEN
 			dezisek_output <= 9;
 			sek_output <= sek_output - 1;
@@ -130,7 +136,8 @@ BEGIN
 	
 	
 	----------------------------------------------------
-	
+	--Tasten-Handling
+	----------------------------------------------------
 		-- If Sek-Button is pressed
 		IF (SEK_last_state = '1') AND (SEK_BUTTON = '0') THEN
 			IF current_state = idle THEN
@@ -146,6 +153,7 @@ BEGIN
 			
 		END IF;
 		
+		--Overflow-Handling
 		IF (sek_output = 10) THEN
 			zehnsek_output <= zehnsek_output + 1;
 			sek_output <= 0;
@@ -155,10 +163,10 @@ BEGIN
 		END IF;
 		
 		
-		
 		-- If Min-Button is pressed
 		IF (MIN_last_state = '1') AND (MIN_BUTTON = '0') THEN
 			IF current_state = idle THEN
+				time_locked_flag := '0';
 				min_output <= min_output + 1;
 				next_state := setup_time;
 			END IF;
@@ -171,6 +179,7 @@ BEGIN
 				END IF;
 			END IF;
 		END IF;
+		
 		
 	
 	-- If Clear-Button is pressed
@@ -215,9 +224,9 @@ BEGIN
 	END IF;
 	
 		
-END PROCESS output_logic;
+END PROCESS statemachine_logic;
 
-
+				--Umwandeln der jeweiligen Dezimalzahl in einen 4-Bit-Wert
 				m_casting: COMPONENT vector_casting PORT MAP (Dezimalzahl => min_output, b3 => m3, b2 => m2, b1 => m1, b0 => m0);		
 				z_casting: COMPONENT vector_casting PORT MAP (Dezimalzahl => zehnsek_output, b3 => z3, b2 => z2, b1 => z1, b0 => z0);
 				s_casting: COMPONENT vector_casting PORT MAP (Dezimalzahl => sek_output, b3 => s3, b2 => s2, b1 => s1, b0 => s0);	
