@@ -1,5 +1,6 @@
 -- Author: Steffen Hettig
 -- Matrikel: 189318
+-- Datum: 01.06.2024
 
 LIBRARY IEEE;
 USE IEEE.std_logic_1164.ALL;
@@ -23,13 +24,16 @@ BEGIN
 				IF dezisek_en = '1' THEN
 					IF tone_output = '1' THEN
 						tone_output_counter <= tone_output_counter + 1;
+						--toggle tone_signal
 						IF tone_output_counter <= 5 THEN
 							tone_signal <= tone_signal XOR '1';
 						END IF;
+						--Resetting takt_counter after one period
 						IF tone_output_counter = 10 THEN
 							tone_output_counter <= 0;
 						END IF;
 					ELSE
+						--clear tone_signal + reset tone_output_counter
 						tone_signal <= '0';
 						tone_output_counter <= 0;
 					END IF;
